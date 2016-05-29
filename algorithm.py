@@ -56,21 +56,45 @@ class Algorithm:
                 town_b = b
 
         edges.append((town_a, town_b))
-        x = [town_a.x, town_b.x]
-        y = [town_a.y, town_b.y]
-        coefficients = numpy.polyfit(x, y, 1)
-        a1 = coefficients[0]
-        b1 = coefficients[1]
-        a2 = -(1/a1)
-        crossroads = []
-        for city in self.points:
-            if not(is_between(town_a, city, town_b)):
-                b2 = city.y - (city.x * a2)
-                x_intersection = (b1 - b2)/(a2 - a1)
-                y_intersection = (a2 * b1 - b2 * a1) / (a2 - a1)
-                new_crossroad = Point(x_intersection, y_intersection, Point.TYPE_CROSSROAD)
-                crossroads.append(new_crossroad)
-                edges.append((city, new_crossroad))
+        if (not((town_a.x - town_b.x) == 0) and not((town_a.y -town_b.y) == 0)):
+            x = [town_a.x, town_b.x]
+            y = [town_a.y, town_b.y]
+            coefficients = numpy.polyfit(x, y, 1)
+            a1 = coefficients[0]
+            b1 = coefficients[1]
+            if a1 == 0:
+                a2 = 0
+            else:
+                a2 = -(1/a1)
+            crossroads = []
+            for city in self.points:
+                if not(is_between(town_a, city, town_b)):
+                    b2 = city.y - (city.x * a2)
+                    if (a2-a1) == 0:
+                        x_intersection = city.x
+                        y_intersection = town_a.y
+                    else:
+                        x_intersection = (b1 - b2)/(a2 - a1)
+                        y_intersection = (a2 * b1 - b2 * a1) / (a2 - a1)
+                    new_crossroad = Point(x_intersection, y_intersection, Point.TYPE_CROSSROAD)
+                    crossroads.append(new_crossroad)
+                    edges.append((city, new_crossroad))
+        elif town_a.x - town_b.x == 0:
+            crossroads = []
+            for city in self.points:
+                if not(is_between(town_a, city, town_b)):
+                    new_crossroad = Point(town_a.x, city.y, Point.TYPE_CROSSROAD)
+                    crossroads.append(new_crossroad)
+                    edges.append((city, new_crossroad))
+        else:
+            crossroads = []
+            for city in self.points:
+                if not (is_between(town_a, city, town_b)):
+                    new_crossroad = Point(city.x, town_a.y, Point.TYPE_CROSSROAD)
+                    crossroads.append(new_crossroad)
+                    edges.append((city, new_crossroad))
+
+
         for e1, e2 in edges:
             print(e1, e2)
         self.points += crossroads
