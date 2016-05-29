@@ -8,6 +8,16 @@ class Point:
         self.y = y
         self.type = point_type
 
+    def __str__(self):
+        str = ""
+        if self.type == self.TYPE_TOWN:
+            str += "Town: "
+        else:
+            str += "Crossroad: "
+        str += repr(self.x) + ", " + repr(self.y)
+        return str
+
+
 
 class State:
     def __init__(self, edges):
