@@ -2,6 +2,8 @@ cairocffi==0.7.2
 CairoSVG==1.0.20
 cffi==1.6.0
 cssselect==0.9.1
+decorator==4.0.9
+networkx==1.11
 pycparser==2.14
 pygal==2.2.2
 tinycss==0.3
