@@ -18,7 +18,6 @@ class Point:
         return str
 
 
-
 class State:
     def __init__(self, edges):
         self.edges = edges
