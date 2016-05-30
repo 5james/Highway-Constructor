@@ -74,13 +74,13 @@ class Algorithm:
             b_pack.sort(key=lambda point:point[0])
             collinear_set = set([])
             for i in range(1, len(b_pack)):
-                if abs(b_pack[i-1][0] - b_pack[i][0]) < sys.float_info.epsilon:
-                    collinear_set.add(b_pack[i][0])
-
+                if abs(b_pack[i-1][0] - b_pack[i][0]) < 10*sys.float_info.epsilon:
+                    rounded_b_pack = round(b_pack[i][0], 2)
+                    collinear_set.add(rounded_b_pack)
             for i in collinear_set:
                 collinear = []
                 for j in b_pack:
-                    if i == j[0]:
+                    if abs(i - j[0]) < sys.float_info.epsilon*100:
                         collinear.append(j[1])
                 collinear.sort(key=lambda point:point.x)
                 collinear_lower = []
@@ -100,6 +100,17 @@ class Algorithm:
                     edges.append((collinear_higher[c], collinear_higher[c-1]))
                     skipped_towns.append(collinear_higher[c])
                     self.points.remove(collinear_higher[c])
+
+                collinear_crossroad = Point((b1 - i) / (a2 - a1), (a2 * b1 - i * a1) / (a2 - a1), Point.TYPE_CROSSROAD)
+                crossroads.append(collinear_crossroad)
+                if not(len(collinear_lower) == 0):
+                    edges.append((collinear_lower[len(collinear_lower)-1], collinear_crossroad))
+                    skipped_towns.append(collinear_lower[len(collinear_lower)-1])
+                    self.points.remove(collinear_lower[len(collinear_lower)-1])
+                if not(len(collinear_higher) == 0):
+                    edges.append((collinear_higher[0], collinear_crossroad))
+                    skipped_towns.append(collinear_higher[0])
+                    self.points.remove(collinear_higher[0])
 
             for city in self.points:
                 if not(is_between(town_a, city, town_b)):
@@ -129,6 +140,7 @@ class Algorithm:
             for i in range(1, len(y_pack)):
                 if abs(y_pack[i] - y_pack[i-1]) < sys.float_info.epsilon:
                     y_set.add(y_pack[i])
+
             for s in y_set:
                 collinear_lower = []
                 collinear_higher = []
@@ -142,15 +154,26 @@ class Algorithm:
                     elif c.x > town_a.x:
                         collinear_higher.append(c)
 
-            for c in range(1, len(collinear_lower)):
-                edges.append((collinear_lower[c-1], collinear_lower[c]))
-                skipped_towns.append(collinear_lower[c-1])
-                self.points.remove(collinear_lower[c-1])
+                for c in range(1, len(collinear_lower)):
+                    edges.append((collinear_lower[c-1], collinear_lower[c]))
+                    skipped_towns.append(collinear_lower[c-1])
+                    self.points.remove(collinear_lower[c-1])
 
-            for c in range(len(collinear_higher)-1, 0, -1):
-                edges.append((collinear_higher[c], collinear_higher[c-1]))
-                skipped_towns.append(collinear_higher[c])
-                self.points.remove(collinear_higher[c])
+                for c in range(len(collinear_higher)-1, 0, -1):
+                    edges.append((collinear_higher[c], collinear_higher[c-1]))
+                    skipped_towns.append(collinear_higher[c])
+                    self.points.remove(collinear_higher[c])
+
+                collinear_crossroad = Point(town_a.x, s, Point.TYPE_CROSSROAD)
+                crossroads.append(collinear_crossroad)
+                if not (len(collinear_lower) == 0):
+                    edges.append((collinear_lower[len(collinear_lower) - 1], collinear_crossroad))
+                    skipped_towns.append(collinear_lower[len(collinear_lower) - 1])
+                    self.points.remove(collinear_lower[len(collinear_lower) - 1])
+                if not (len(collinear_higher) == 0):
+                    edges.append((collinear_higher[0], collinear_crossroad))
+                    skipped_towns.append(collinear_higher[0])
+                    self.points.remove(collinear_higher[0])
 
             for city in self.points:
                 if not(is_between(town_a, city, town_b)):
@@ -182,15 +205,26 @@ class Algorithm:
                     elif c.y > town_a.y:
                         collinear_higher.append(c)
 
-            for c in range(1, len(collinear_lower)):
-                edges.append((collinear_lower[c-1], collinear_lower[c]))
-                skipped_towns.append(collinear_lower[c-1])
-                self.points.remove(collinear_lower[c-1])
+                for c in range(1, len(collinear_lower)):
+                    edges.append((collinear_lower[c-1], collinear_lower[c]))
+                    skipped_towns.append(collinear_lower[c-1])
+                    self.points.remove(collinear_lower[c-1])
 
-            for c in range(len(collinear_higher)-1, 0, -1):
-                edges.append((collinear_higher[c], collinear_higher[c-1]))
-                skipped_towns.append(collinear_higher[c])
-                self.points.remove(collinear_higher[c])
+                for c in range(len(collinear_higher)-1, 0, -1):
+                    edges.append((collinear_higher[c], collinear_higher[c-1]))
+                    skipped_towns.append(collinear_higher[c])
+                    self.points.remove(collinear_higher[c])
+
+                collinear_crossroad = Point(s, town_a.y, Point.TYPE_CROSSROAD)
+                crossroads.append(collinear_crossroad)
+                if not (len(collinear_lower) == 0):
+                    edges.append((collinear_lower[len(collinear_lower) - 1], collinear_crossroad))
+                    skipped_towns.append(collinear_lower[len(collinear_lower) - 1])
+                    self.points.remove(collinear_lower[len(collinear_lower) - 1])
+                if not (len(collinear_higher) == 0):
+                    edges.append((collinear_higher[0], collinear_crossroad))
+                    skipped_towns.append(collinear_higher[0])
+                    self.points.remove(collinear_higher[0])
 
             for city in self.points:
                 if not (is_between(town_a, city, town_b)):
@@ -215,11 +249,13 @@ class Algorithm:
         else:
             edges.append((town_a, town_b))
 
-        for e1, e2 in edges:
-            print(e1, e2)
         self.points += crossroads
         self.state = State(edges)
 
+        for e1, e2 in edges:
+            print(e1, e2)
+        for c in self.points:
+            print(c)
     def fitness_function(self, state):
         graph = networkx.Graph()
 
