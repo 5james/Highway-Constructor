@@ -7,4 +7,5 @@ networkx==1.11
 numpy==1.11.0
 pycparser==2.14
 pygal==2.2.2
+Shapely==1.5.16
 tinycss==0.3
