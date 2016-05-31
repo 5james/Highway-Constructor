@@ -10,13 +10,13 @@ def distance(a, b):
 
 
 def is_between(a, c, b):
-    return -sys.float_info.epsilon < (distance(a,c) + distance(c,b)) - distance(a,b) < sys.float_info.epsilon
+    return -sys.float_info.epsilon < (distance(a, c) + distance(c, b)) - distance(a, b) < sys.float_info.epsilon
 
 
 class Point:
     TYPE_TOWN, TYPE_CROSSROAD = range(0, 2)
 
-    def __init__(self, x, y, point_type):
+    def __init__(self, x, y, point_type=TYPE_TOWN):
         self.x = x
         self.y = y
         self.type = point_type
@@ -34,6 +34,53 @@ class Point:
 class State:
     def __init__(self, edges):
         self.edges = edges
+        self.points = {edge[0] for edge in self.edges} | {edge[1] for edge in self.edges}
+
+    def get_neighbours(self):
+        neighbours = []
+
+        for i in range(0, len(self.points)):
+            for j in range(i + 1, len(self.points)):
+                # If edge between points[i] and points[j] exist try to delete it, else create it.
+                if (self.points[i], self.points[j]) in self.edges or (self.points[j], self.points[i]) in self.edges:
+                    # Delete one edge.
+                    neighbour_edges = [edge for edge in self.edges
+                                 if (edge != (self.points[i], self.points[j])) and (edge != (self.points[j], self.points[i]))]
+
+                    # Check if graph is still connected.
+                    graph = networkx.Graph()
+                    for edge in neighbour_edges:
+                        graph.add_edge(*edge)
+                    if graph.is_connected():
+                        neighbours.append(State(neighbour_edges))
+                else:
+                    new_edges = self._sanitize_edges([(self.points[i], self.points[j])])
+
+        return neighbours
+
+    def _sanitize_edges(self, edges):
+        """
+        Checks if there are points that lay on the edges.
+        """
+        new_edges = set()
+        for edge in edges:
+            found_point_between = False
+            for point in self.points:
+                if point is not edge[0] and point is not edge[1]:
+                    if is_between(edge[0], point, edge[1]):
+                        if (edge[0], point) not in self.edges and (point, edge[0]) not in self.edges:
+                            new_edges.add((edge[0], point))
+                        if (edge[1], point) not in self.edges and (point, edge[1]) not in self.edges:
+                            new_edges.add((point, edge[1]))
+                        found_point_between = True
+                        break
+            if not found_point_between:
+                new_edges.add(edge)
+
+        if set(edges) == new_edges:
+            return edges
+        else:
+            return self._sanitize_edges(list(new_edges))
 
 
 class Algorithm:
@@ -54,7 +101,7 @@ class Algorithm:
                 max_dist = dist
                 town_a = city1
                 town_b = b
-        if (not((town_a.x - town_b.x) == 0) and not((town_a.y -town_b.y) == 0)):
+        if not((town_a.x - town_b.x) == 0) and not((town_a.y -town_b.y) == 0):
             skipped_towns = []
 
             x = [town_a.x, town_b.x]
@@ -239,7 +286,7 @@ class Algorithm:
             if not(pnt == town_a) and not(pnt == town_b):
                 if is_between(town_a, pnt, town_b):
                     towns_beetween_a_and_b.append(pnt)
-        towns_beetween_a_and_b.sort(key = lambda point: point.x)
+        towns_beetween_a_and_b.sort(key=lambda point: point.x)
 
         if not(len(towns_beetween_a_and_b) == 0):
             edges.append((town_a, towns_beetween_a_and_b[0]))
@@ -256,6 +303,7 @@ class Algorithm:
             print(e1, e2)
         for c in self.points:
             print(c)
+
     def fitness_function(self, state):
         graph = networkx.Graph()
 
