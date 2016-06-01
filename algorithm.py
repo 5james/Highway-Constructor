@@ -11,6 +11,10 @@ import sys
 def distance(a, b):
     return numpy.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2)
 
+def is_around(x, y):
+    if abs(x-y) < 0.5:
+        return True
+    return False
 
 def is_between(a, c, b):
     return -0.71 < (distance(a, c) + distance(c, b)) - distance(a, b) < 0.71
@@ -143,8 +147,6 @@ class Algorithm:
     def __init__(self, point_tuples):
         self.roads_length_factor = 1
         self.paths_length_factor = 1
-        self.iterations = 400
-        self.temperature = 100
 
         self.points = []
         edges = []
@@ -158,7 +160,7 @@ class Algorithm:
                 max_dist = dist
                 town_a = city1
                 town_b = b
-        if not((town_a.x - town_b.x) == 0) and not((town_a.y - town_b.y) == 0):
+        if (not((town_a.x - town_b.x) == 0) and not((town_a.y -town_b.y) == 0)):
             skipped_towns = []
 
             x = [town_a.x, town_b.x]
@@ -205,8 +207,14 @@ class Algorithm:
                     skipped_towns.append(collinear_higher[c])
                     self.points.remove(collinear_higher[c])
 
-                collinear_crossroad = Point((b1 - i) / (a2 - a1), (a2 * b1 - i * a1) / (a2 - a1), Point.TYPE_CROSSROAD)
-                crossroads.append(collinear_crossroad)
+                point_x = (b1 - i) / (a2 - a1)
+                point_y = (a2 - a1), (a2 * b1 - i * a1) / (a2 - a1)
+                for pt in self.points:
+                    if is_around(pt.x, point_x) and is_around(pt.y, point_y):
+                        collinear_crossroad = pt
+                    else:
+                        collinear_crossroad = Point((b1 - i) / (a2 - a1), (a2 * b1 - i * a1) / (a2 - a1), Point.TYPE_CROSSROAD)
+                        crossroads.append(collinear_crossroad)
                 if not(len(collinear_lower) == 0):
                     edges.append((collinear_lower[len(collinear_lower)-1], collinear_crossroad))
                     skipped_towns.append(collinear_lower[len(collinear_lower)-1])
@@ -343,7 +351,11 @@ class Algorithm:
             if not(pnt == town_a) and not(pnt == town_b):
                 if is_between(town_a, pnt, town_b):
                     towns_beetween_a_and_b.append(pnt)
-        towns_beetween_a_and_b.sort(key=lambda point: point.x)
+        for pnt in crossroads:
+            if not(pnt == town_a) and not(pnt == town_b):
+                if is_between(town_a, pnt, town_b):
+                    towns_beetween_a_and_b.append(pnt)
+        towns_beetween_a_and_b.sort(key = lambda point: point.x)
 
         if not(len(towns_beetween_a_and_b) == 0):
             edges.append((town_a, towns_beetween_a_and_b[0]))
