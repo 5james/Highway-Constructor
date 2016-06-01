@@ -46,13 +46,20 @@ def read_cities():
 
 def save_result(state, fitness, filename):
     custom_style = pygal.style.Style(
+        show_legend=False,
         colors=('#000000',))
 
     chart = pygal.XY(title=str(fitness), style=custom_style)
 
-    chart.show_legend = False
-    chart.show_x_labels = False
-    chart.show_y_labels = False
+    # Disable autoscaling
+    max_x = max(point.x for point in state.points)
+    max_y = max(point.y for point in state.points)
+
+    chart_length = max_x if max_x > max_y else max_y
+
+    labels = [int(chart_length / 9 * i) for i in range(0, 10)]
+    chart.x_labels = labels
+    chart.y_labels = labels
 
     for edge in state.edges:
         chart.add('', [

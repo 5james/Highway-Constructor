@@ -2,6 +2,7 @@ import networkx
 import itertools
 import math
 import numpy
+import random
 from shapely.geometry import LineString
 from shapely.geometry.point import Point as ShapelyPoint
 import sys
@@ -41,6 +42,7 @@ class State:
     def get_neighbours(self):
         neighbours = []
 
+        # Add or remove edges
         for i in range(0, len(self.points)):
             for j in range(i + 1, len(self.points)):
                 # If edge between points[i] and points[j] exist try to delete it, else create it.
@@ -134,9 +136,6 @@ class State:
                 if first_point is second_point:
                     return False
         return True
-
-
-import random
 
 
 class Algorithm:
@@ -375,6 +374,7 @@ class Algorithm:
                 self.state = new_state
                 current_state_fitness = new_state_fitness
             elif numpy.random.uniform() < self.probability(current_state_fitness, new_state_fitness):
+                self.state = new_state
                 current_state_fitness = new_state_fitness
 
         self.temperature *= 0.99
