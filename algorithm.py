@@ -12,7 +12,7 @@ def distance(a, b):
 
 
 def is_between(a, c, b):
-    return -sys.float_info.epsilon < (distance(a, c) + distance(c, b)) - distance(a, b) < sys.float_info.epsilon
+    return -0.71 < (distance(a, c) + distance(c, b)) - distance(a, b) < 0.71
 
 
 class Point:
@@ -46,8 +46,9 @@ class State:
                 # If edge between points[i] and points[j] exist try to delete it, else create it.
                 if (self.points[i], self.points[j]) in self.edges or (self.points[j], self.points[i]) in self.edges:
                     # Delete one edge.
-                    neighbour_edges = [edge for edge in self.edges
-                                 if (edge != (self.points[i], self.points[j])) and (edge != (self.points[j], self.points[i]))]
+                    neighbour_edges = \
+                        [edge for edge in self.edges
+                         if (edge != (self.points[i], self.points[j])) and (edge != (self.points[j], self.points[i]))]
 
                     # Check if graph is still connected.
                     graph = networkx.Graph()
@@ -68,30 +69,30 @@ class State:
         """
         Checks if there are points that lay on the edges.
         """
-        new_edges = []
+        new_edges = set()
         for edge in edges:
             found_point_between = False
             for point in self.points:
                 if point is not edge[0] and point is not edge[1]:
                     if is_between(edge[0], point, edge[1]):
                         if (edge[0], point) not in self.edges and (point, edge[0]) not in self.edges:
-                            new_edges.append((edge[0], point))
+                            new_edges.add((edge[0], point))
                         if (edge[1], point) not in self.edges and (point, edge[1]) not in self.edges:
-                            new_edges.append((point, edge[1]))
+                            new_edges.add((point, edge[1]))
                         found_point_between = True
                         break
             if not found_point_between:
-                new_edges.append(edge)
+                new_edges.add(edge)
 
-        if set(edges) == set(new_edges):
-            return edges
+        if set(edges) == new_edges:
+            return list(edges)
         else:
-            return self._sanitize_edges(new_edges)
+            return self._sanitize_edges(list(new_edges))
 
     @staticmethod
     def _add_crossroads(new_edges, current_edges):
-        new_new_edges = []
-        new_current_edges = []
+        new_new_edges = set()
+        new_current_edges = set()
         split_current_edge = [False] * len(current_edges)
 
         for new_edge in new_edges:
@@ -105,22 +106,22 @@ class State:
                     intersection = new_line_segment.intersection(current_line_segment)
                     if type(intersection) is ShapelyPoint:
                         new_crossroad = Point(intersection.x, intersection.y, Point.TYPE_CROSSROAD)
-                        new_current_edges.extend(State._split_edge(current_edge, new_crossroad))
-                        new_new_edges.extend(State._split_edge(new_edge, new_crossroad))
+                        new_current_edges.update(State._split_edge(current_edge, new_crossroad))
+                        new_new_edges.update(State._split_edge(new_edge, new_crossroad))
                         split_current_edge[current_edge_index] = True
                         found_crossroad = True
                         break
             if not found_crossroad:
-                new_new_edges.append(new_edge)
+                new_new_edges.add(new_edge)
 
         for current_edge_index, current_edge in enumerate(current_edges):
             if not split_current_edge[current_edge_index]:
-                new_current_edges.append(current_edge)
+                new_current_edges.add(current_edge)
 
-        if set(current_edges) == set(new_current_edges) and set(new_edges) == set(new_new_edges):
-            return current_edges + new_edges
+        if set(current_edges) == new_current_edges and set(new_edges) == new_new_edges:
+            return list(current_edges) + list(new_edges)
         else:
-            return State._add_crossroads(new_new_edges, new_current_edges)
+            return State._add_crossroads(list(new_new_edges), list(new_current_edges))
 
     @staticmethod
     def _split_edge(edge, point):
@@ -135,11 +136,16 @@ class State:
         return True
 
 
+import random
+
+
 class Algorithm:
 
     def __init__(self, point_tuples):
         self.roads_length_factor = 1
         self.paths_length_factor = 1
+        self.iterations = 400
+        self.temperature = 100
 
         self.points = []
         edges = []
@@ -356,13 +362,33 @@ class Algorithm:
         for c in self.points:
             print(c)
 
+    def simulated_annealing(self):
+
+        current_state_fitness = self.fitness_function(self.state)
+
+        for i in range(0, self.iterations):
+            new_state = random.choice(self.state.get_neighbours())
+
+            new_state_fitness = self.fitness_function(new_state)
+
+            if new_state_fitness < current_state_fitness:
+                self.state = new_state
+                current_state_fitness = new_state_fitness
+            elif numpy.random.uniform() < self.probability(current_state_fitness, new_state_fitness):
+                current_state_fitness = new_state_fitness
+
+        self.temperature *= 0.99
+
+    def probability(self, current_state_fitness, new_state_fitness):
+        return math.exp(- abs(current_state_fitness - new_state_fitness) / self.temperature)
+
     def fitness_function(self, state):
         graph = networkx.Graph()
 
         for edge in state.edges:
             graph.add_edge(edge[0], edge[1], {'weight': distance(edge[0], edge[1])})
 
-        towns = [point for point in self.points if point.type == Point.TYPE_TOWN]
+        towns = [point for point in state.points if point.type == Point.TYPE_TOWN]
 
         paths_length = 0
         for i in range(0, len(towns)):
