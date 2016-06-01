@@ -19,7 +19,7 @@ def main():
     #          (points[4], points[5]), (points[5], points[0])]
     #
     # alg.state = State(edges)
-    # alg.simulated_annealing()
+    alg.simulated_annealing()
 
     fitness = alg.fitness_function(alg.state)
     save_result(alg.state, fitness, 'results')

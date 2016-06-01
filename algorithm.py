@@ -11,13 +11,19 @@ import sys
 def distance(a, b):
     return numpy.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2)
 
+
 def is_around(x, y):
     if abs(x-y) < 0.5:
         return True
     return False
 
+
 def is_between(a, c, b):
-    return -0.71 < (distance(a, c) + distance(c, b)) - distance(a, b) < 0.71
+    return -sys.float_info.epsilon < (distance(a, c) + distance(c, b)) - distance(a, b) < sys.float_info.epsilon
+
+
+def is_close_to_segment(a, b, c):
+    return -0.71 < distance(a, c) + distance(c, b) - distance(a, b) < 0.71
 
 
 class Point:
@@ -80,7 +86,7 @@ class State:
             found_point_between = False
             for point in self.points:
                 if point is not edge[0] and point is not edge[1]:
-                    if is_between(edge[0], point, edge[1]):
+                    if is_close_to_segment(edge[0], point, edge[1]):
                         if (edge[0], point) not in self.edges and (point, edge[0]) not in self.edges:
                             new_edges.add((edge[0], point))
                         if (edge[1], point) not in self.edges and (point, edge[1]) not in self.edges:
