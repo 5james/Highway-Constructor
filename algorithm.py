@@ -19,7 +19,7 @@ def is_around(x, y):
 
 
 def is_between(a, c, b):
-    return -sys.float_info.epsilon*10 < (distance(a, c) + distance(c, b)) - distance(a, b) < sys.float_info.epsilon*10
+    return -sys.float_info.epsilon*1000 < (distance(a, c) + distance(c, b)) - distance(a, b) < sys.float_info.epsilon*1000
 
 
 def is_close_to_segment(a, b, c):
@@ -82,8 +82,10 @@ class State:
         crossroads = [p for p in self.points if p.type == Point.TYPE_CROSSROAD]
         
         for current_crossroad in crossroads:
-            new_crossroads = [Point(current_crossroad.x + diff, current_crossroad.y), Point(current_crossroad.x - diff, current_crossroad.y),
-                              Point(current_crossroad.x, current_crossroad.y + diff), Point(current_crossroad.x, current_crossroad.y - diff)]
+            new_crossroads = [Point(current_crossroad.x + diff, current_crossroad.y, Point.TYPE_CROSSROAD),
+                              Point(current_crossroad.x - diff, current_crossroad.y, Point.TYPE_CROSSROAD),
+                              Point(current_crossroad.x, current_crossroad.y + diff, Point.TYPE_CROSSROAD),
+                              Point(current_crossroad.x, current_crossroad.y - diff, Point.TYPE_CROSSROAD)]
             
             for new_crossroad in new_crossroads:
                 new_edges = []
@@ -430,7 +432,10 @@ class Algorithm:
                 self.state = new_state
                 current_state_fitness = new_state_fitness
 
-        self.temperature *= 0.99
+            print('Probability')
+            print(self.probability(current_state_fitness, new_state_fitness))
+
+            self.temperature *= 0.9
 
     def probability(self, current_state_fitness, new_state_fitness):
         return math.exp(- abs(current_state_fitness - new_state_fitness) / self.temperature)
