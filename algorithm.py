@@ -200,8 +200,10 @@ class Algorithm:
                 collinear.sort(key=lambda point:point.x)
                 collinear_lower = []
                 collinear_higher = []
+                print(a1)
+                print(b1)
                 for c in collinear:
-                    if a1 > 0 and c.y > a1 * c.x + b1:
+                    if (a1 > 0 and c.y > a1 * c.x + b1) or (a1 < 0 and c.y < a1 * c.x + b1):
                         collinear_lower.append(c)
                     else:
                         collinear_higher.append(c)
@@ -215,7 +217,6 @@ class Algorithm:
                     edges.append((collinear_higher[c], collinear_higher[c-1]))
                     skipped_towns.append(collinear_higher[c])
                     self.points.remove(collinear_higher[c])
-
                 point_x = (b1 - i) / (a2 - a1)
                 point_y = (a2 - a1), (a2 * b1 - i * a1) / (a2 - a1)
                 found = False
@@ -373,10 +374,6 @@ class Algorithm:
                 if is_between(town_a, pnt, town_b):
                     towns_beetween_a_and_b.append(pnt)
         towns_beetween_a_and_b.sort(key = lambda point: point.x)
-
-        for i in towns_beetween_a_and_b:
-            print(i)
-
 
         if not(len(towns_beetween_a_and_b) == 0):
             edges.append((town_a, towns_beetween_a_and_b[0]))
