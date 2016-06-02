@@ -13,13 +13,13 @@ def distance(a, b):
 
 
 def is_around(x, y):
-    if abs(x-y) < 0.5:
+    if abs(x-y) < 0.2:
         return True
     return False
 
 
 def is_between(a, c, b):
-    return -sys.float_info.epsilon < (distance(a, c) + distance(c, b)) - distance(a, b) < sys.float_info.epsilon
+    return -sys.float_info.epsilon*10 < (distance(a, c) + distance(c, b)) - distance(a, b) < sys.float_info.epsilon*10
 
 
 def is_close_to_segment(a, b, c):
@@ -166,6 +166,9 @@ class Algorithm:
                 max_dist = dist
                 town_a = city1
                 town_b = b
+
+        if (town_a.x > town_b.x):
+            town_a, town_b = town_b, town_a
         if (not((town_a.x - town_b.x) == 0) and not((town_a.y -town_b.y) == 0)):
             skipped_towns = []
 
@@ -186,8 +189,8 @@ class Algorithm:
             b_pack.sort(key=lambda point:point[0])
             collinear_set = set([])
             for i in range(1, len(b_pack)):
-                if abs(b_pack[i-1][0] - b_pack[i][0]) < 10*sys.float_info.epsilon:
-                    rounded_b_pack = round(b_pack[i][0], 2)
+                if abs(b_pack[i-1][0] - b_pack[i][0]) < 100*sys.float_info.epsilon:
+                    rounded_b_pack = round(b_pack[i][0], 1)
                     collinear_set.add(rounded_b_pack)
             for i in collinear_set:
                 collinear = []
@@ -215,12 +218,15 @@ class Algorithm:
 
                 point_x = (b1 - i) / (a2 - a1)
                 point_y = (a2 - a1), (a2 * b1 - i * a1) / (a2 - a1)
+                found = False
                 for pt in self.points:
                     if is_around(pt.x, point_x) and is_around(pt.y, point_y):
                         collinear_crossroad = pt
-                    else:
-                        collinear_crossroad = Point((b1 - i) / (a2 - a1), (a2 * b1 - i * a1) / (a2 - a1), Point.TYPE_CROSSROAD)
-                        crossroads.append(collinear_crossroad)
+                        found = True
+                        break
+                if not(found):
+                    collinear_crossroad = Point((b1 - i) / (a2 - a1), (a2 * b1 - i * a1) / (a2 - a1), Point.TYPE_CROSSROAD)
+                    crossroads.append(collinear_crossroad)
                 if not(len(collinear_lower) == 0):
                     edges.append((collinear_lower[len(collinear_lower)-1], collinear_crossroad))
                     skipped_towns.append(collinear_lower[len(collinear_lower)-1])
@@ -239,12 +245,17 @@ class Algorithm:
                     else:
                         x_intersection = (b1 - b2)/(a2 - a1)
                         y_intersection = (a2 * b1 - b2 * a1) / (a2 - a1)
-                    new_crossroad = Point(x_intersection, y_intersection, Point.TYPE_CROSSROAD)
+
+                    found_crossroad = False
                     for pp in self.points:
-                        if (-sys.float_info.epsilon < pp.x -  x_intersection < sys.float_info.epsilon
-                            and -sys.float_info.epsilon < pp.y -  y_intersection < sys.float_info.epsilon):
+                        if (-0.2 < pp.x -  x_intersection < 0.2
+                            and -0.2 < pp.y -  y_intersection < 0.2):
                             new_crossroad = pp
-                    crossroads.append(new_crossroad)
+                            found_crossroad = True
+                            break
+                    if not(found_crossroad):
+                        new_crossroad = Point(x_intersection, y_intersection, Point.TYPE_CROSSROAD)
+                        crossroads.append(new_crossroad)
                     edges.append((city, new_crossroad))
             self.points += skipped_towns
         elif town_a.x - town_b.x == 0:
@@ -362,6 +373,10 @@ class Algorithm:
                 if is_between(town_a, pnt, town_b):
                     towns_beetween_a_and_b.append(pnt)
         towns_beetween_a_and_b.sort(key = lambda point: point.x)
+
+        for i in towns_beetween_a_and_b:
+            print(i)
+
 
         if not(len(towns_beetween_a_and_b) == 0):
             edges.append((town_a, towns_beetween_a_and_b[0]))
