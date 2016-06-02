@@ -9,10 +9,10 @@ def main():
     #
     # point_tuples = ((0, 0), (1, 1))
     # alg = Algorithm(point_tuples)
-    # alg.roads_length_factor = 0
-    # alg.paths_length_factor = 1
-    # alg.temperature = 100
-    # alg.iterations = 400
+    alg.roads_length_factor = 1
+    alg.paths_length_factor = 1
+    alg.temperature = 100
+    alg.iterations = 400
     #
     # points = [Point(3, 0), Point(0, 2), Point(0, 5), Point(3, 7), Point(6, 5), Point(6, 2)]
     # edges = [(points[0], points[1]), (points[1], points[2]), (points[2], points[3]), (points[3], points[4]),

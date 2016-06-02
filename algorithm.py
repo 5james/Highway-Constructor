@@ -84,9 +84,10 @@ class State:
         new_edges = set()
         for edge in edges:
             found_point_between = False
+            segment = LineString([(edge[0].x, edge[0].y), (edge[1].x, edge[1].y)])
             for point in self.points:
                 if point is not edge[0] and point is not edge[1]:
-                    if is_close_to_segment(edge[0], point, edge[1]):
+                    if segment.distance(ShapelyPoint(point.x, point.y)) < 1e-8:
                         if (edge[0], point) not in self.edges and (point, edge[0]) not in self.edges:
                             new_edges.add((edge[0], point))
                         if (edge[1], point) not in self.edges and (point, edge[1]) not in self.edges:
