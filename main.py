@@ -1,5 +1,6 @@
 import sys
 import pygal
+import datetime
 from algorithm import Algorithm, Point, State
 
 
@@ -9,8 +10,8 @@ def main():
     #
     # point_tuples = ((0, 0), (1, 1))
     # alg = Algorithm(point_tuples)
-    alg.roads_length_factor = 1
-    alg.paths_length_factor = 0
+    alg.roads_length_factor = 2
+    alg.paths_length_factor = 1
     alg.temperature = 50
     alg.iterations = 100
     #
@@ -22,7 +23,8 @@ def main():
     alg.simulated_annealing()
 
     fitness = alg.fitness_function(alg.state)
-    save_result(alg.state, fitness, 'results')
+    file_name = 'result%s' % datetime.datetime.now()
+    save_result(alg.state, fitness, file_name)
 
 
 def read_cities():
