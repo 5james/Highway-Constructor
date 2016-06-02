@@ -75,6 +75,27 @@ class State:
                     neighbour_edges = self._add_crossroads(new_edges, self.edges)
                     neighbours.append(State(neighbour_edges))
 
+        # Move point
+        max_distance = max(distance(edge[0], edge[1]) for edge in self.edges)
+        diff = max_distance / 50
+        
+        crossroads = [p for p in self.points if p.type == Point.TYPE_CROSSROAD]
+        
+        for current_crossroad in crossroads:
+            new_crossroads = [Point(current_crossroad.x + diff, current_crossroad.y), Point(current_crossroad.x - diff, current_crossroad.y),
+                              Point(current_crossroad.x, current_crossroad.y + diff), Point(current_crossroad.x, current_crossroad.y - diff)]
+            
+            for new_crossroad in new_crossroads:
+                new_edges = []
+                for edge in self.edges:
+                    if edge[0] == current_crossroad:
+                        new_edges.append((new_crossroad, edge[1]))
+                    elif edge[1] == current_crossroad:
+                        new_edges.append((edge[0], new_crossroad))
+                    else:
+                        new_edges.append(edge)
+                neighbours.append(State(new_edges))
+
         return neighbours
 
     def _sanitize_edges(self, edges):
@@ -397,6 +418,7 @@ class Algorithm:
         current_state_fitness = self.fitness_function(self.state)
 
         for i in range(0, self.iterations):
+            print('Iteration: ' + str(i))
             new_state = random.choice(self.state.get_neighbours())
 
             new_state_fitness = self.fitness_function(new_state)
