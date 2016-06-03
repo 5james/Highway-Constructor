@@ -1,6 +1,6 @@
 import sys
 import pygal
-import datetime
+import time
 from algorithm import Algorithm, Point, State
 
 
@@ -10,10 +10,10 @@ def main():
     #
     # point_tuples = ((0, 0), (1, 1))
     # alg = Algorithm(point_tuples)
-    alg.roads_length_factor = 2
+    alg.roads_length_factor = 7
     alg.paths_length_factor = 1
-    alg.temperature = 50
-    alg.iterations = 100
+    alg.temperature = 5
+    alg.iterations = 5
     #
     # points = [Point(3, 0), Point(0, 2), Point(0, 5), Point(3, 7), Point(6, 5), Point(6, 2)]
     # edges = [(points[0], points[1]), (points[1], points[2]), (points[2], points[3]), (points[3], points[4]),
@@ -23,7 +23,9 @@ def main():
     alg.simulated_annealing()
 
     fitness = alg.fitness_function(alg.state)
-    file_name = 'result%s' % datetime.datetime.now()
+    file_name = "result"
+    millis = int(round(time.time() * 1000))
+    file_name += str(millis)
     save_result(alg.state, fitness, file_name)
 
 
@@ -71,7 +73,7 @@ def save_result(state, fitness, filename):
             },
             {
                 'value': (edge[1].x, edge[1].y),
-                'node': {'r': 2 if edge[1].type == Point.TYPE_TOWN else 2}
+                'node': {'r': 4 if edge[1].type == Point.TYPE_TOWN else 2}
             }])
 
     chart.render_to_file(filename)
