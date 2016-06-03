@@ -12,6 +12,7 @@ def main():
     # alg = Algorithm(point_tuples)
     alg.roads_length_factor = 7
     alg.paths_length_factor = 1
+    alg.max_same_state_iterations = 10
     alg.temperature = 5
     alg.iterations = 5
     #
