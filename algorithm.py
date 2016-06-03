@@ -177,7 +177,6 @@ class Algorithm:
     def __init__(self, point_tuples):
         self.roads_length_factor = 1
         self.paths_length_factor = 1
-
         self.points = []
         edges = []
 
@@ -419,8 +418,10 @@ class Algorithm:
 
         current_state_fitness = self.fitness_function(self.state)
 
+        same_state_iterations = 0
         for i in range(0, self.iterations):
             print('Iteration: ' + str(i))
+
             new_state = random.choice(self.state.get_neighbours())
 
             new_state_fitness = self.fitness_function(new_state)
@@ -436,6 +437,12 @@ class Algorithm:
             print(self.probability(current_state_fitness, new_state_fitness))
 
             self.temperature *= 0.9
+            if self.state == new_state:
+                same_state_iterations = 0
+            else:
+                same_state_iterations += 1
+            if same_state_iterations > self.max_same_state_iterations:
+                break
 
     def probability(self, current_state_fitness, new_state_fitness):
         return math.exp(- abs(current_state_fitness - new_state_fitness) / self.temperature)
