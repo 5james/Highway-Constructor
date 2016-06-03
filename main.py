@@ -10,11 +10,11 @@ def main():
     #
     # point_tuples = ((0, 0), (1, 1))
     # alg = Algorithm(point_tuples)
-    alg.roads_length_factor = 7
-    alg.paths_length_factor = 1
-    alg.max_same_state_iterations = 10
-    alg.temperature = 5
-    alg.iterations = 5
+    alg.roads_length_factor = 1
+    alg.paths_length_factor = 1.5
+    alg.max_same_state_iterations = 50
+    alg.temperature = 80
+    alg.iterations = 750
     #
     #
     # points = [Point(3, 0), Point(0, 2), Point(0, 5), Point(3, 7), Point(6, 5), Point(6, 2)]
@@ -22,7 +22,7 @@ def main():
     #          (points[4], points[5]), (points[5], points[0])]
     #
     # alg.state = State(edges)
-    alg.simulated_annealing()
+    iters_ended = alg.simulated_annealing()
 
     fitness = alg.fitness_function(alg.state)
     file_name = "result"
@@ -32,6 +32,8 @@ def main():
              + "\na = " + str(alg.roads_length_factor) \
              + "\nb = " + str(alg.paths_length_factor) \
              + "\niterations = " + str(alg.iterations) \
+             + "\nended after = " + str(iters_ended) \
+             + "\nsame_state = " + str(alg.max_same_state_iterations) \
              + "\n" + str(point_tuples)
     save_result(alg.state, header, file_name)
 

@@ -416,6 +416,8 @@ class Algorithm:
 
     def simulated_annealing(self):
 
+        after_how_many_iters_ended = 0
+
         current_state_fitness = self.fitness_function(self.state)
 
         same_state_iterations = 0
@@ -443,6 +445,8 @@ class Algorithm:
                 same_state_iterations += 1
             if same_state_iterations > self.max_same_state_iterations:
                 break
+            after_how_many_iters_ended += 1
+        return after_how_many_iters_ended
 
     def probability(self, current_state_fitness, new_state_fitness):
         return math.exp(- abs(current_state_fitness - new_state_fitness) / self.temperature)
