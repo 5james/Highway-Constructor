@@ -16,6 +16,7 @@ def main():
     alg.temperature = 5
     alg.iterations = 5
     #
+    #
     # points = [Point(3, 0), Point(0, 2), Point(0, 5), Point(3, 7), Point(6, 5), Point(6, 2)]
     # edges = [(points[0], points[1]), (points[1], points[2]), (points[2], points[3]), (points[3], points[4]),
     #          (points[4], points[5]), (points[5], points[0])]
