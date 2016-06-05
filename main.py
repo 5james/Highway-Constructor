@@ -7,8 +7,8 @@ from algorithm import Algorithm, Point, State
 
 def main():
     parser = argparse.ArgumentParser(description='Highway builder.')
-    parser.add_argument('-a', required=True, type=int, help='Roads length factor.')
-    parser.add_argument('-b', required=True, type=int, help='Path length factor.')
+    parser.add_argument('-a', required=True, type=float, help='Roads length factor.')
+    parser.add_argument('-b', required=True, type=float, help='Path length factor.')
     parser.add_argument('-i', default=20, type=int, help='Number of iterations.')
 
     args = parser.parse_args()
