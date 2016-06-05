@@ -1,3 +1,4 @@
+import argparse
 import sys
 import pygal
 import time
@@ -5,23 +6,27 @@ from algorithm import Algorithm, Point, State
 
 
 def main():
+    parser = argparse.ArgumentParser(description='Highway builder.')
+    parser.add_argument('-a', required=True, type=int, help='Roads length factor.')
+    parser.add_argument('-b', required=True, type=int, help='Path length factor.')
+    parser.add_argument('-i', default=20, type=int, help='Number of iterations.')
+
+    args = parser.parse_args()
+
+    if args.a < 0:
+        print('Roads length factor should be greater or equal 0.')
+        exit()
+
+    if args.b < 0:
+        print('Path length factor should be greater or equal 0.')
+        exit()
+
+    if args.i < 1:
+        print('Number of iterations should be greater than 0.')
+
     point_tuples = read_cities()
-    alg = Algorithm(point_tuples)
-    #
-    # point_tuples = ((0, 0), (1, 1))
-    # alg = Algorithm(point_tuples)
-    alg.roads_length_factor = 1
-    alg.paths_length_factor = 1.5
-    alg.max_same_state_iterations = 50
-    alg.temperature = 80
-    alg.iterations = 750
-    #
-    #
-    # points = [Point(3, 0), Point(0, 2), Point(0, 5), Point(3, 7), Point(6, 5), Point(6, 2)]
-    # edges = [(points[0], points[1]), (points[1], points[2]), (points[2], points[3]), (points[3], points[4]),
-    #          (points[4], points[5]), (points[5], points[0])]
-    #
-    # alg.state = State(edges)
+    alg = Algorithm(point_tuples, roads_length_factor=args.a, paths_length_factor=args.b, iterations=args.i)
+
     iters_ended = alg.simulated_annealing()
 
     fitness = alg.fitness_function(alg.state)

@@ -174,9 +174,12 @@ class State:
 
 class Algorithm:
 
-    def __init__(self, point_tuples):
-        self.roads_length_factor = 1
-        self.paths_length_factor = 1
+    def __init__(self, point_tuples, roads_length_factor, paths_length_factor, iterations):
+        self.roads_length_factor = roads_length_factor
+        self.paths_length_factor = paths_length_factor
+        self.iterations = iterations;
+        self.max_same_state_iterations = 15
+        self.temperature = 80
         self.points = []
         edges = []
 
@@ -223,8 +226,6 @@ class Algorithm:
                 collinear.sort(key=lambda point:point.x)
                 collinear_lower = []
                 collinear_higher = []
-                print(a1)
-                print(b1)
                 for c in collinear:
                     if (a1 > 0 and c.y > a1 * c.x + b1) or (a1 < 0 and c.y < a1 * c.x + b1):
                         collinear_lower.append(c)
@@ -409,11 +410,6 @@ class Algorithm:
         self.points += crossroads
         self.state = State(edges)
 
-        for e1, e2 in edges:
-            print(e1, e2)
-        for c in self.points:
-            print(c)
-
     def simulated_annealing(self):
 
         after_how_many_iters_ended = 0
@@ -434,9 +430,6 @@ class Algorithm:
             elif numpy.random.uniform() < self.probability(current_state_fitness, new_state_fitness):
                 self.state = new_state
                 current_state_fitness = new_state_fitness
-
-            print('Probability')
-            print(self.probability(current_state_fitness, new_state_fitness))
 
             self.temperature *= 0.9
             if self.state == new_state:
